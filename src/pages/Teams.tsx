@@ -22,7 +22,9 @@ import { Badge } from '../components/ui/badge';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
+  DropdownMenuGroup,
   DropdownMenuItem, 
+  DropdownMenuSeparator,
   DropdownMenuTrigger 
 } from '../components/ui/dropdown-menu';
 import { useAuth } from '../context/AuthContext';
@@ -109,16 +111,20 @@ export default function Teams() {
                     </Button>
                   } />
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="gap-2">
-                      <Settings className="w-4 h-4" /> Team Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2">
-                      <UserPlus className="w-4 h-4" /> Invite Member
-                    </DropdownMenuItem>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem className="gap-2">
+                        <Settings className="w-4 h-4" /> Team Settings
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2">
+                        <UserPlus className="w-4 h-4" /> Invite Member
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="gap-2 text-red-600 dark:text-red-400">
-                      <Trash2 className="w-4 h-4" /> Leave Team
-                    </DropdownMenuItem>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem className="gap-2 text-red-600 dark:text-red-400">
+                        <Trash2 className="w-4 h-4" /> Leave Team
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -169,8 +175,4 @@ export default function Teams() {
       </div>
     </div>
   );
-}
-
-function DropdownMenuSeparator() {
-  return <div className="h-px bg-zinc-100 dark:bg-zinc-800 my-1" />;
 }

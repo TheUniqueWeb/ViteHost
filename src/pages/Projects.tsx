@@ -27,6 +27,7 @@ import {
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
+  DropdownMenuGroup,
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '../components/ui/dropdown-menu';
@@ -57,6 +58,8 @@ export default function Projects() {
   const [newProjectDesc, setNewProjectDesc] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -148,12 +151,14 @@ export default function Projects() {
     }
   };
 
-  const handleDeleteProject = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this project?')) return;
+  const handleDeleteProject = async () => {
+    if (!projectToDelete) return;
     
     try {
-      await deleteDoc(doc(db, 'projects', id));
+      await deleteDoc(doc(db, 'projects', projectToDelete));
       toast.success('Project deleted.');
+      setIsDeleteModalOpen(false);
+      setProjectToDelete(null);
     } catch (error) {
       toast.error('Failed to delete project.');
     }
@@ -308,18 +313,24 @@ export default function Projects() {
                     </Button>
                   } />
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="gap-2">
-                      <Settings className="w-4 h-4" /> Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2">
-                      <Zap className="w-4 h-4" /> Deployments
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="gap-2 text-red-600 dark:text-red-400"
-                      onClick={() => handleDeleteProject(project.id)}
-                    >
-                      <Trash2 className="w-4 h-4" /> Delete
-                    </DropdownMenuItem>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem className="gap-2">
+                        <Settings className="w-4 h-4" /> Settings
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2">
+                        <Zap className="w-4 h-4" /> Deployments
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className="gap-2 text-red-600 dark:text-red-400"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setProjectToDelete(project.id);
+                          setIsDeleteModalOpen(true);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" /> Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -368,6 +379,22 @@ export default function Projects() {
           </div>
         )}
       </div>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete the project
+              and remove all associated deployments from our servers.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteProject}>Delete Project</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
